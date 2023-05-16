@@ -49,7 +49,7 @@ export async function run() {
       }
     }
 
-    if (labels.length > 0) {
+    if (labels.length >= 0) {
       await addLabels(client, prNumber, labels);
     }
 

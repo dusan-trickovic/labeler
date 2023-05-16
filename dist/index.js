@@ -75,7 +75,7 @@ function run() {
                     labelsToRemove.push(label);
                 }
             }
-            if (labels.length > 0) {
+            if (labels.length >= 0) {
                 yield addLabels(client, prNumber, labels);
             }
             if (syncLabels && labelsToRemove.length) {
