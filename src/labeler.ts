@@ -253,6 +253,7 @@ async function addLabels(
           issue_number: prNumber,
           labels: firstLabels
         });
+        await new Promise(r => setTimeout(r, 200));
     }
     else anyLabelsLeft = false;
   }
