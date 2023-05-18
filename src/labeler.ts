@@ -245,7 +245,7 @@ async function addLabels(
         });
         anyLabelsLeft = false;
     }
-    else if (labels.length > 48) {
+    else if (labels.length > 48 && labels.length < 100) {
         const firstLabels = labels.splice(0, 48);
         await client.rest.issues.addLabels({
           owner: github.context.repo.owner,
@@ -253,7 +253,7 @@ async function addLabels(
           issue_number: prNumber,
           labels: firstLabels
         });
-        await new Promise(r => setTimeout(r, 200));
+        continue;
     }
     else anyLabelsLeft = false;
   }

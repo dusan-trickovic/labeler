@@ -221,21 +221,30 @@ function checkMatch(changedFiles, matchConfig) {
     return true;
 }
 function addLabels(client, prNumber, labels) {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const currentLabels = ((_a = (yield client.rest.issues.listLabelsOnIssue({
-            owner: github.context.repo.owner,
-            repo: github.context.repo.repo,
-            issue_number: prNumber
-        }))) === null || _a === void 0 ? void 0 : _a.data.map(({ name }) => name)) || [];
-        const labelsToBeAdded = labels.filter(label => !currentLabels.includes(label));
-        if (labelsToBeAdded.length > 0) {
-            yield client.rest.issues.addLabels({
-                owner: github.context.repo.owner,
-                repo: github.context.repo.repo,
-                issue_number: prNumber,
-                labels: labelsToBeAdded
-            });
+        let anyLabelsLeft = true;
+        while (anyLabelsLeft) {
+            if (labels.length <= 48 && labels.length >= 1) {
+                yield client.rest.issues.addLabels({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    issue_number: prNumber,
+                    labels: labels
+                });
+                anyLabelsLeft = false;
+            }
+            else if (labels.length > 48 && labels.length < 100) {
+                const firstLabels = labels.splice(0, 48);
+                yield client.rest.issues.addLabels({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    issue_number: prNumber,
+                    labels: firstLabels
+                });
+                continue;
+            }
+            else
+                anyLabelsLeft = false;
         }
     });
 }
