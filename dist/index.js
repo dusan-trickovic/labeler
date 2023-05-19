@@ -232,16 +232,19 @@ function sendLabels(client, prNumber, labels) {
 }
 function addLabels(client, prNumber, labels) {
     return __awaiter(this, void 0, void 0, function* () {
-        let firstLabels = [];
+        const upperLabelLimitInRequest = 48;
+        const labelListBreakPoint = Math.floor(labels.length / 2);
+        const totalLabelsAllowed = 100;
+        let firstHalfOfLabels = [];
         while (labels.length > 0) {
-            if (labels.length >= 48 && labels.length <= 100) {
-                firstLabels = labels.splice(0, Math.floor(labels.length / 2));
-                if (firstLabels.length >= 48) {
-                    sendLabels(client, prNumber, firstLabels.splice(0, Math.floor(labels.length / 2)));
-                    sendLabels(client, prNumber, firstLabels);
+            if (labels.length >= upperLabelLimitInRequest && labels.length <= totalLabelsAllowed) {
+                firstHalfOfLabels = labels.splice(0, labelListBreakPoint);
+                if (firstHalfOfLabels.length >= 48) {
+                    sendLabels(client, prNumber, firstHalfOfLabels.splice(0, labelListBreakPoint));
+                    sendLabels(client, prNumber, firstHalfOfLabels);
                     continue;
                 }
-                sendLabels(client, prNumber, firstLabels);
+                sendLabels(client, prNumber, firstHalfOfLabels);
             }
             else {
                 sendLabels(client, prNumber, labels.splice(0, labels.length));
