@@ -253,16 +253,22 @@ async function addLabels(
   let firstHalfOfLabels: string[] = [];
 
   while (labels.length > 0) {
-    if (labels.length >= upperLabelLimitInRequest && labels.length <= totalLabelsAllowed) {
+    if (
+      labels.length >= upperLabelLimitInRequest &&
+      labels.length <= totalLabelsAllowed
+    ) {
       firstHalfOfLabels = labels.splice(0, labelListBreakPoint);
       if (firstHalfOfLabels.length >= upperLabelLimitInRequest) {
-        sendLabels(client, prNumber, firstHalfOfLabels.splice(0, labelListBreakPoint));
+        sendLabels(
+          client,
+          prNumber,
+          firstHalfOfLabels.splice(0, labelListBreakPoint)
+        );
         sendLabels(client, prNumber, firstHalfOfLabels);
         continue;
       }
       sendLabels(client, prNumber, firstHalfOfLabels);
-    }
-    else {
+    } else {
       sendLabels(client, prNumber, labels.splice(0, labels.length));
     }
   }

@@ -237,7 +237,8 @@ function addLabels(client, prNumber, labels) {
         const totalLabelsAllowed = 100;
         let firstHalfOfLabels = [];
         while (labels.length > 0) {
-            if (labels.length >= upperLabelLimitInRequest && labels.length <= totalLabelsAllowed) {
+            if (labels.length >= upperLabelLimitInRequest &&
+                labels.length <= totalLabelsAllowed) {
                 firstHalfOfLabels = labels.splice(0, labelListBreakPoint);
                 if (firstHalfOfLabels.length >= upperLabelLimitInRequest) {
                     sendLabels(client, prNumber, firstHalfOfLabels.splice(0, labelListBreakPoint));
