@@ -239,7 +239,7 @@ function addLabels(client, prNumber, labels) {
         while (labels.length > 0) {
             if (labels.length >= upperLabelLimitInRequest && labels.length <= totalLabelsAllowed) {
                 firstHalfOfLabels = labels.splice(0, labelListBreakPoint);
-                if (firstHalfOfLabels.length >= 48) {
+                if (firstHalfOfLabels.length >= upperLabelLimitInRequest) {
                     sendLabels(client, prNumber, firstHalfOfLabels.splice(0, labelListBreakPoint));
                     sendLabels(client, prNumber, firstHalfOfLabels);
                     continue;
