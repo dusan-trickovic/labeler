@@ -49,7 +49,7 @@ export async function run() {
       }
     }
 
-    if (labels.length >= 0) {
+    if (labels.length > 0) {
       await addLabels(client, prNumber, labels);
     }
 
@@ -246,7 +246,7 @@ async function addLabels(
         anyLabelsLeft = false;
     }
     else if (labels.length > 48 && labels.length < 100) {
-        const firstLabels = labels.splice(0, 48);
+        let firstLabels = labels.splice(0, 48);
         await client.rest.issues.addLabels({
           owner: github.context.repo.owner,
           repo: github.context.repo.repo,
