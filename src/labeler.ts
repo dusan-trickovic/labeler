@@ -229,28 +229,37 @@ function checkMatch(changedFiles: string[], matchConfig: MatchConfig): boolean {
   return true;
 }
 
+async function sendLabels(
+  client: ClientType,
+  prNumber: number,
+  labels: string[]
+) {
+  await client.rest.issues.addLabels({
+    owner: github.context.repo.owner,
+    repo: github.context.repo.repo,
+    issue_number: prNumber,
+    labels: labels
+  });
+}
+
 async function addLabels(
   client: ClientType,
   prNumber: number,
   labels: string[]
 ) {
+  let firstLabels: string[] = [];
   while (labels.length > 0) {
-    if (labels.length >= 48) {
-      await client.rest.issues.addLabels({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: prNumber,
-        labels: labels.splice(0, Math.floor(labels.length / 2))
-      });
-      continue;
+    if (labels.length >= 48 && labels.length <= 100) {
+      firstLabels = labels.splice(0, Math.floor(labels.length / 2));
+      if (firstLabels.length >= 48) {
+        sendLabels(client, prNumber, firstLabels.splice(0, Math.floor(labels.length / 2)));
+        sendLabels(client, prNumber, firstLabels);
+        continue;
+      }
+      sendLabels(client, prNumber, firstLabels);
     }
     else {
-      await client.rest.issues.addLabels({
-        owner: github.context.repo.owner,
-        repo: github.context.repo.repo,
-        issue_number: prNumber,
-        labels: labels.splice(0, labels.length)
-      });
+      sendLabels(client, prNumber, labels.splice(0, labels.length));
     }
   }
 }

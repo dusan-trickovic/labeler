@@ -220,25 +220,31 @@ function checkMatch(changedFiles, matchConfig) {
     }
     return true;
 }
+function sendLabels(client, prNumber, labels) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield client.rest.issues.addLabels({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: prNumber,
+            labels: labels
+        });
+    });
+}
 function addLabels(client, prNumber, labels) {
     return __awaiter(this, void 0, void 0, function* () {
+        let firstLabels = [];
         while (labels.length > 0) {
-            if (labels.length >= 48) {
-                yield client.rest.issues.addLabels({
-                    owner: github.context.repo.owner,
-                    repo: github.context.repo.repo,
-                    issue_number: prNumber,
-                    labels: labels.splice(0, Math.floor(labels.length / 2))
-                });
-                continue;
+            if (labels.length >= 48 && labels.length <= 100) {
+                firstLabels = labels.splice(0, Math.floor(labels.length / 2));
+                if (firstLabels.length >= 48) {
+                    sendLabels(client, prNumber, firstLabels.splice(0, Math.floor(labels.length / 2)));
+                    sendLabels(client, prNumber, firstLabels);
+                    continue;
+                }
+                sendLabels(client, prNumber, firstLabels);
             }
             else {
-                yield client.rest.issues.addLabels({
-                    owner: github.context.repo.owner,
-                    repo: github.context.repo.repo,
-                    issue_number: prNumber,
-                    labels: labels.splice(0, labels.length)
-                });
+                sendLabels(client, prNumber, labels.splice(0, labels.length));
             }
         }
     });
