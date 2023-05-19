@@ -222,10 +222,19 @@ function checkMatch(changedFiles, matchConfig) {
 }
 function addLabels(client, prNumber, labels) {
     return __awaiter(this, void 0, void 0, function* () {
-        let anyLabelsLeft = true;
         let firstLabels = [];
-        while (anyLabelsLeft) {
-            if (labels.length <= 48 && labels.length >= 1) {
+        while (labels.length > 0) {
+            if (labels.length >= 48 && labels.length < 100) {
+                firstLabels = labels.splice(0, Math.floor(labels.length / 2));
+                yield client.rest.issues.addLabels({
+                    owner: github.context.repo.owner,
+                    repo: github.context.repo.repo,
+                    issue_number: prNumber,
+                    labels: firstLabels
+                });
+                continue;
+            }
+            else {
                 firstLabels = labels.splice(0, labels.length);
                 yield client.rest.issues.addLabels({
                     owner: github.context.repo.owner,
@@ -233,20 +242,7 @@ function addLabels(client, prNumber, labels) {
                     issue_number: prNumber,
                     labels: firstLabels
                 });
-                continue;
             }
-            else if (labels.length > 48 && labels.length < 100) {
-                firstLabels = labels.splice(0, 48);
-                yield client.rest.issues.addLabels({
-                    owner: github.context.repo.owner,
-                    repo: github.context.repo.repo,
-                    issue_number: prNumber,
-                    labels: firstLabels
-                });
-                continue;
-            }
-            else
-                anyLabelsLeft = false;
         }
     });
 }

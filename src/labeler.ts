@@ -234,30 +234,28 @@ async function addLabels(
   prNumber: number,
   labels: string[]
 ) {
-  let anyLabelsLeft = true;
   let firstLabels: string[] = [];
-  while (anyLabelsLeft) {
-    if (labels.length <= 48 && labels.length >= 1) {
-        firstLabels = labels.splice(0, labels.length);
-        await client.rest.issues.addLabels({
-          owner: github.context.repo.owner,
-          repo: github.context.repo.repo,
-          issue_number: prNumber,
-          labels: firstLabels
-        });
-        continue;
+
+  while (labels.length > 0) {
+    if (labels.length >= 48 && labels.length < 100) {
+      firstLabels = labels.splice(0, Math.floor(labels.length / 2));
+      await client.rest.issues.addLabels({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        issue_number: prNumber,
+        labels: firstLabels
+      });
+      continue;
     }
-    else if (labels.length > 48 && labels.length < 100) {
-        firstLabels = labels.splice(0, 48);
-        await client.rest.issues.addLabels({
-          owner: github.context.repo.owner,
-          repo: github.context.repo.repo,
-          issue_number: prNumber,
-          labels: firstLabels
-        });
-        continue;
+    else {
+      firstLabels = labels.splice(0, labels.length);
+      await client.rest.issues.addLabels({
+        owner: github.context.repo.owner,
+        repo: github.context.repo.repo,
+        issue_number: prNumber,
+        labels: firstLabels
+      });
     }
-    else anyLabelsLeft = false;
   }
 }
 
