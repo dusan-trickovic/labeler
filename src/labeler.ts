@@ -235,18 +235,20 @@ async function addLabels(
   labels: string[]
 ) {
   let anyLabelsLeft = true;
+  let firstLabels: string[] = [];
   while (anyLabelsLeft) {
     if (labels.length <= 48 && labels.length >= 1) {
+        firstLabels = labels.splice(0, labels.length);
         await client.rest.issues.addLabels({
           owner: github.context.repo.owner,
           repo: github.context.repo.repo,
           issue_number: prNumber,
-          labels: labels
+          labels: firstLabels
         });
-        anyLabelsLeft = false;
+        continue;
     }
     else if (labels.length > 48 && labels.length < 100) {
-        let firstLabels = labels.splice(0, 48);
+        firstLabels = labels.splice(0, 48);
         await client.rest.issues.addLabels({
           owner: github.context.repo.owner,
           repo: github.context.repo.repo,

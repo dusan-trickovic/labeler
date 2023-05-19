@@ -75,7 +75,7 @@ function run() {
                     labelsToRemove.push(label);
                 }
             }
-            if (labels.length >= 0) {
+            if (labels.length > 0) {
                 yield addLabels(client, prNumber, labels);
             }
             if (syncLabels && labelsToRemove.length) {
@@ -223,18 +223,20 @@ function checkMatch(changedFiles, matchConfig) {
 function addLabels(client, prNumber, labels) {
     return __awaiter(this, void 0, void 0, function* () {
         let anyLabelsLeft = true;
+        let firstLabels = [];
         while (anyLabelsLeft) {
             if (labels.length <= 48 && labels.length >= 1) {
+                firstLabels = labels.splice(0, labels.length);
                 yield client.rest.issues.addLabels({
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
                     issue_number: prNumber,
-                    labels: labels
+                    labels: firstLabels
                 });
-                anyLabelsLeft = false;
+                continue;
             }
             else if (labels.length > 48 && labels.length < 100) {
-                const firstLabels = labels.splice(0, 48);
+                firstLabels = labels.splice(0, 48);
                 yield client.rest.issues.addLabels({
                     owner: github.context.repo.owner,
                     repo: github.context.repo.repo,
