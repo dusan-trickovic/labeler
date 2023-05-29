@@ -220,6 +220,8 @@ function checkMatch(changedFiles, matchConfig) {
     }
     return true;
 }
+const ISSUE_LABELS_LIMIT = 100;
+const LABELS_LIMIT_TO_ADD_AT_ONCE = 48;
 function sendLabels(client, prNumber, labels) {
     return __awaiter(this, void 0, void 0, function* () {
         yield client.rest.issues.addLabels({
@@ -232,24 +234,24 @@ function sendLabels(client, prNumber, labels) {
 }
 function addLabels(client, prNumber, labels) {
     return __awaiter(this, void 0, void 0, function* () {
-        const upperLabelLimitInRequest = 48;
-        const labelListBreakPoint = Math.floor(labels.length / 2);
-        const totalLabelsAllowed = 100;
-        let firstHalfOfLabels = [];
-        while (labels.length > 0) {
-            if (labels.length >= upperLabelLimitInRequest &&
-                labels.length <= totalLabelsAllowed) {
-                firstHalfOfLabels = labels.splice(0, labelListBreakPoint);
-                if (firstHalfOfLabels.length >= upperLabelLimitInRequest) {
-                    sendLabels(client, prNumber, firstHalfOfLabels.splice(0, labelListBreakPoint));
-                    sendLabels(client, prNumber, firstHalfOfLabels);
-                    continue;
-                }
-                sendLabels(client, prNumber, firstHalfOfLabels);
-            }
-            else {
-                sendLabels(client, prNumber, labels.splice(0, labels.length));
-            }
+        const currentLabels = (yield client.rest.issues.listLabelsOnIssue({
+            owner: github.context.repo.owner,
+            repo: github.context.repo.repo,
+            issue_number: prNumber
+        })).data.map(({ name }) => name) || [];
+        const labelsToBeAdded = labels.filter(label => !currentLabels.includes(label));
+        if (labelsToBeAdded.length <= LABELS_LIMIT_TO_ADD_AT_ONCE) {
+            yield sendLabels(client, prNumber, labelsToBeAdded);
+            return;
+        }
+        if (labelsToBeAdded.length + currentLabels.length > ISSUE_LABELS_LIMIT) {
+            core.warning(`Labels limit exceeded. The maximum allowable number of labels is ${ISSUE_LABELS_LIMIT}. Only ${ISSUE_LABELS_LIMIT - currentLabels.length} labels will be added.`);
+            labelsToBeAdded.splice(ISSUE_LABELS_LIMIT - currentLabels.length);
+        }
+        while (labelsToBeAdded.length > 0) {
+            let splicedLabelsList = [];
+            splicedLabelsList = labelsToBeAdded.splice(0, LABELS_LIMIT_TO_ADD_AT_ONCE / 2);
+            yield sendLabels(client, prNumber, splicedLabelsList);
         }
     });
 }
