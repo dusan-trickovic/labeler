@@ -240,7 +240,7 @@ function addLabels(client, prNumber, labels) {
             repo: github.context.repo.repo,
             issue_number: prNumber
         }))) === null || _a === void 0 ? void 0 : _a.data.map(({ name }) => name)) || [];
-        const labelsToBeAdded = labels.filter(label => !currentLabels.includes(label));
+        const labelsToBeAdded = currentLabels.length === 0 ? labels : labels.filter(label => !currentLabels.includes(label));
         if (labelsToBeAdded.length <= LABELS_LIMIT_TO_ADD_AT_ONCE) {
             yield sendLabels(client, prNumber, labelsToBeAdded);
             return;

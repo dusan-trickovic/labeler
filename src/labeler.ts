@@ -256,7 +256,7 @@ async function addLabels(
     issue_number: prNumber
   }))?.data.map(({name}) => name) || [];
 
-  const labelsToBeAdded = labels.filter(
+  const labelsToBeAdded = currentLabels.length === 0 ? labels : labels.filter(
     label => !currentLabels.includes(label)
   );
 
