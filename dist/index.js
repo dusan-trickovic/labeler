@@ -233,12 +233,13 @@ function sendLabels(client, prNumber, labels) {
     });
 }
 function addLabels(client, prNumber, labels) {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const currentLabels = (yield client.rest.issues.listLabelsOnIssue({
+        const currentLabels = ((_a = (yield client.rest.issues.listLabelsOnIssue({
             owner: github.context.repo.owner,
             repo: github.context.repo.repo,
             issue_number: prNumber
-        })).data.map(({ name }) => name) || [];
+        }))) === null || _a === void 0 ? void 0 : _a.data.map(({ name }) => name)) || [];
         const labelsToBeAdded = labels.filter(label => !currentLabels.includes(label));
         if (labelsToBeAdded.length <= LABELS_LIMIT_TO_ADD_AT_ONCE) {
             yield sendLabels(client, prNumber, labelsToBeAdded);

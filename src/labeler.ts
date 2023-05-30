@@ -254,7 +254,7 @@ async function addLabels(
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
     issue_number: prNumber
-  })).data.map(({name}) => name) || [];
+  }))?.data.map(({name}) => name) || [];
 
   const labelsToBeAdded = labels.filter(
     label => !currentLabels.includes(label)
